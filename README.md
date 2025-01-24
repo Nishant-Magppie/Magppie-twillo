@@ -1,6 +1,6 @@
 # Magppie-twillo
 
-1. git clone <repository name>
+1. git clone https://github.com/Nishant-Magppie/Magppie-twillo.git  #here copy clone id or download as zip
 
 2. cd  Magppie-twillo
 
