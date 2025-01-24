@@ -1,0 +1,244 @@
+<html>
+    <head>
+        <title>Sunroof Call Interface</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f9;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+
+            .container {
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                padding: 40px;
+                width: 400px;
+                text-align: center;
+            }
+
+            h2 {
+                color: #333;
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+
+            #phoneNumber {
+                width: 100%;
+                height: 40px;
+                text-align: center;
+                font-size: 18px;
+                padding: 10px;
+                margin-bottom: 20px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                background-color: #f9f9f9;
+            }
+
+            .dial-pad {
+                display: grid;
+                grid-template-columns: repeat(3, 60px);
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .dial-pad button {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+                background-color: #007bff;
+                color: #fff;
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            .dial-pad button:hover {
+                background-color: #0056b3;
+            }
+
+            .button-group {
+                margin-top: 20px;
+            }
+
+            .button-group button {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+                color: #fff;
+                background-color: #28a745;
+                border: none;
+                border-radius: 5px;
+                margin-bottom: 10px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            .button-group button:hover {
+                background-color: #218838;
+            }
+
+            #csvFileInput {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 20px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                background-color: #f9f9f9;
+                cursor: pointer;
+            }
+
+            footer {
+                margin-top: 20px;
+                color: #555;
+                font-size: 14px;
+            }
+
+            footer a {
+                color: #007bff;
+                text-decoration: none;
+            }
+
+            footer a:hover {
+                text-decoration: underline;
+            }
+
+            /* Responsive design for smaller screens */
+            @media (max-width: 500px) {
+                .container {
+                    width: 90%;
+                    padding: 20px;
+                }
+
+                .dial-pad {
+                    grid-template-columns: repeat(3, 50px);
+                }
+
+                .button-group button {
+                    font-size: 14px;
+                    padding: 10px;
+                }
+
+                #phoneNumber {
+                    font-size: 16px;
+                    height: 35px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Sunroof Call Interface</h2>
+            <input type="text" id="phoneNumber" value="+91" readonly />
+            
+            <div class="dial-pad">
+                <button onclick="addNumber('1')">1</button>
+                <button onclick="addNumber('2')">2</button>
+                <button onclick="addNumber('3')">3</button>
+                <button onclick="addNumber('4')">4</button>
+                <button onclick="addNumber('5')">5</button>
+                <button onclick="addNumber('6')">6</button>
+                <button onclick="addNumber('7')">7</button>
+                <button onclick="addNumber('8')">8</button>
+                <button onclick="addNumber('9')">9</button>
+                <button onclick="addNumber('*')">*</button>
+                <button onclick="addNumber('0')">0</button>
+                <button onclick="addNumber('#')">#</button>
+            </div>
+
+            <div class="button-group">
+                <button onclick="makeCall()">Single Call</button>
+                <input type="file" id="csvFileInput" accept=".csv" />
+                <button onclick="makeBulkCall()">Bulk Call</button>
+                <button onclick="clearNumber()">Clear</button>
+            </div>
+
+            <footer>
+                <p>Developed by <a href="www.Quytech.com" target="_blank">Vedic Agrawal</a></p>
+            </footer>
+        </div>
+
+        <script>
+            let csvFile = null;
+
+            // Function to add number to the input field
+            function addNumber(digit) {
+                let phoneInput = document.getElementById('phoneNumber');
+                if (phoneInput.value === '+91') {
+                    phoneInput.value = '+91' + digit;
+                } else {
+                    phoneInput.value += digit;
+                }
+            }
+
+            // Function to clear the number input field
+            function clearNumber() {
+                document.getElementById('phoneNumber').value = '+91'; // Reset to default +91
+                document.getElementById('csvFileInput').value = '';
+            }
+
+            // Handle file upload
+            document.getElementById('csvFileInput').addEventListener('change', handleFileSelect, false);
+
+            function handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) {
+                    alert("Please select a file.");
+                    return;
+                }
+                csvFile = file;
+            }
+
+            // Make a single call
+            function makeCall() {
+                let phoneNumber = document.getElementById('phoneNumber').value;
+                if (!phoneNumber || phoneNumber === '+91') {
+                    alert("Please enter a valid phone number");
+                    return;
+                }
+
+                fetch(`/make-call?phone_number=${phoneNumber}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Call successful!");
+                        } else {
+                            alert("Call failed. Try again.");
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            // Make a bulk call (uploads CSV and sends phone numbers to backend)
+            function makeBulkCall() {
+                if (!csvFile) {
+                    alert("Please upload a CSV file first.");
+                    return;
+                }
+
+                let formData = new FormData();
+                formData.append('file', csvFile);
+
+                fetch('/make-bulk-call', {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Bulk call successfully transferred to all numbers.");
+                        } else {
+                            alert("Bulk call failed. Try again.");
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        </script>
+    </body>
+</html>
