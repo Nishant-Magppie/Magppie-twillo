@@ -1,0 +1,9 @@
+fastapi==0.103.0  # Supports Pydantic v2
+uvicorn==0.20.0
+twilio==7.15.0
+elevenlabs==1.0.0
+python-dotenv==0.21.0
+aiohttp==3.8.1
+jinja2==3.1.2
+asyncio==3.4.3
+pydantic>=2.0
